@@ -229,7 +229,9 @@
       this.clearStandings();
       this.loading();
 
-      let recordsUrl = this.baseApiUrl + '/standings/' + (season - 1) + '/' + (day - 1);
+      let season0 = season - 1;
+      let day0 = day - 1;
+      let recordsUrl = this.baseApiUrl + '/standings/' + season0 + '/' + (day0 + 1);
       fetch(recordsUrl)
       .then(res => res.json())
       .then((standingsApiResult) => {
