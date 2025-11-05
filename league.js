@@ -141,10 +141,10 @@
       if (mode >= 10 && mode < 20 && selectedSeason === currentSeason + 1) { // In-season, current season selected
         const currentDay = Math.floor(elapsed / 3600) + 1;
         if (currentDay > 1) {
-          for (let i = 1; i < currentDay; i++) {
+          for (let i = 1; i <= currentDay; i++) {
             days.push(i);
           }
-          defaultDayValue = currentDay - 1;
+          defaultDayValue = currentDay;
         } else {
           // No full day has passed, so no days to list for this season.
           // The fallback below will handle this.
