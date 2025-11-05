@@ -8,6 +8,8 @@
     loadingElem : null,
     season : null,
     day: null,
+    urlSeason: null,
+    urlDay: null,
 
     containers : [
       'league-standings-header-container',
@@ -15,6 +17,7 @@
     ],
 
     init : function() {
+      this.getUrlParams();
       this.loading();
       this.loadConfig();
       this.registerDropdownListeners();
@@ -50,6 +53,12 @@
      * and pass them along to the API-calling functions.
      */
     modeApiResult: null,
+
+    getUrlParams : function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      this.urlSeason = urlParams.get('season');
+      this.urlDay = urlParams.get('day');
+    },
 
     loadConfig : function() {
       let url = this.baseApiUrl + '/mode';
@@ -87,10 +96,10 @@
           defaultSeason = 1;
         }
       } else { // In-season or post-season
-        for (let i = 1; i <= currentSeason; i++) {
+        for (let i = 1; i <= currentSeason + 1; i++) {
           seasons.push(i);
         }
-        defaultSeason = currentSeason;
+        defaultSeason = currentSeason + 1;
       }
       seasons.reverse();
 
@@ -103,8 +112,16 @@
         seasonDropdownMenu.appendChild(a);
       });
 
-      this.season = defaultSeason;
-      seasonDropdownButton.textContent = defaultSeason;
+      let selectedSeason = defaultSeason;
+      if (this.urlSeason) {
+        const urlSeasonNum = parseInt(this.urlSeason, 10);
+        if (!isNaN(urlSeasonNum) && urlSeasonNum > 0 && urlSeasonNum <= defaultSeason) {
+            selectedSeason = urlSeasonNum;
+        }
+      }
+
+      this.season = selectedSeason;
+      seasonDropdownButton.textContent = selectedSeason;
       this.updateDayDropdown();
     },
 
@@ -121,7 +138,7 @@
       let days = [];
       let defaultDayValue;
 
-      if (mode >= 10 && mode < 20 && selectedSeason === currentSeason) { // In-season, current season selected
+      if (mode >= 10 && mode < 20 && selectedSeason === currentSeason + 1) { // In-season, current season selected
         const currentDay = Math.floor(elapsed / 3600) + 1;
         if (currentDay > 1) {
           for (let i = 1; i < currentDay; i++) {
@@ -156,8 +173,17 @@
         dayDropdownMenu.appendChild(a);
       });
 
-      this.day = defaultDayValue;
-      dayDropdownButton.textContent = defaultDayValue;
+      let selectedDay = defaultDayValue;
+      if (this.urlDay) {
+        const urlDayNum = parseInt(this.urlDay, 10);
+        if (!isNaN(urlDayNum) && urlDayNum > 0 && urlDayNum <= defaultDayValue) {
+            selectedDay = urlDayNum;
+        }
+        this.urlDay = null;
+      }
+
+      this.day = selectedDay;
+      dayDropdownButton.textContent = selectedDay;
     },
 
     registerDropdownListeners: function() {
