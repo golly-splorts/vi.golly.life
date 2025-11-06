@@ -80,14 +80,17 @@
       seasonDropdownMenu.innerHTML = '';
       const seasonDropdownButton = document.getElementById('season-dropdown-button');
       const mode = this.modeApiResult.mode;
-      const currentSeason = this.modeApiResult.season;
+
+      const currentSeason0 = this.modeApiResult.season;
+      const currentSeason = currentSeason0 + 1;
       
+      // 1-indexed
       let seasons = [];
       let defaultSeason;
 
       if (mode < 10) { // Pre-season
         if (currentSeason > 1) {
-          for (let i = 1; i < currentSeason; i++) {
+          for (let i = 1; i < currentSeason - 1; i++) {
             seasons.push(i);
           }
           defaultSeason = currentSeason - 1;
@@ -96,10 +99,10 @@
           defaultSeason = 1;
         }
       } else { // In-season or post-season
-        for (let i = 1; i <= currentSeason + 1; i++) {
+        for (let i = 1; i <= currentSeason; i++) {
           seasons.push(i);
         }
-        defaultSeason = currentSeason + 1;
+        defaultSeason = currentSeason;
       }
       seasons.reverse();
 
@@ -112,16 +115,22 @@
         seasonDropdownMenu.appendChild(a);
       });
 
+      // Start with the default
       let selectedSeason = defaultSeason;
+
+      // Handle a user-provided season via url params
       if (this.urlSeason) {
         const urlSeasonNum = parseInt(this.urlSeason, 10);
         if (!isNaN(urlSeasonNum) && urlSeasonNum > 0 && urlSeasonNum <= defaultSeason) {
             selectedSeason = urlSeasonNum;
         }
+        // Otherwise, just use default
       }
 
       this.season = selectedSeason;
       seasonDropdownButton.textContent = selectedSeason;
+
+      // Chain the day update drop-down (behavior depends on season drop-down)
       this.updateDayDropdown();
     },
 
@@ -231,7 +240,7 @@
 
       let season0 = season - 1;
       let day0 = day - 1;
-      let recordsUrl = this.baseApiUrl + '/standings/' + season0 + '/' + (day0 + 1);
+      let recordsUrl = this.baseApiUrl + '/standings/' + season0 + '/' + day0;
       fetch(recordsUrl)
       .then(res => res.json())
       .then((standingsApiResult) => {
